@@ -10,7 +10,7 @@ JSON CRDT data structures. It allows multiple users to edit the `<input>` and
 Installation:
 
 ```
-npm install collaborative-input
+npm install json-joy collaborative-input
 ```
 
 Usage:
