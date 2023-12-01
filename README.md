@@ -10,7 +10,7 @@ JSON CRDT data structures. It allows multiple users to edit the `<input>` and
 Installation:
 
 ```
-npm install collaborative-input
+npm install json-joy collaborative-input
 ```
 
 Usage:
@@ -18,7 +18,7 @@ Usage:
 ```ts
 import {StrBinding} from 'collaborative-input';
 
-const str = model.str(['path', 'to', 'string']);
+const str = model.api.str(['path', 'to', 'string']);
 const input = document.getElementById('input');
 const unbind = StrBinding.bind(str, input);
 
