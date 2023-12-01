@@ -34,5 +34,6 @@ module.exports = {
     'no-empty': 'off',
     quotes: 'off',
     'react/no-unescaped-entities': 'off',
+    '@typescript-eslint/no-var-requires': 'off',
   },
 };
