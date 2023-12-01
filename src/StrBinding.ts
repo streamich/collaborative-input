@@ -1,9 +1,10 @@
-import diff from 'fast-diff';
 import {invokeFirstOnly} from './util';
 import {Selection} from './Selection';
 import {applyChange} from './util';
 import {SimpleChange} from './types';
 import type {StrApi} from 'json-joy/es2020/json-crdt';
+
+const diff = require('fast-diff');
 
 const enum DIFF_CHANGE_TYPE {
   DELETE = -1,
