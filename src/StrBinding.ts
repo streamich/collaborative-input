@@ -1,7 +1,7 @@
 import diff from 'fast-diff';
 import {invokeFirstOnly} from './util';
 import {Selection} from './Selection';
-import {applyChange, idToIndex, indexToId} from './util';
+import {applyChange} from './util';
 import {SimpleChange} from './types';
 import type {StrApi} from 'json-joy/es2020/json-crdt';
 
@@ -51,8 +51,8 @@ export class StrBinding {
     selection.dir = selectionDirection;
     selection.ts = now;
     selection.tick = tick;
-    selection.startId = typeof selectionStart === 'number' ? indexToId(this.str, selectionStart ?? 0) ?? null : null;
-    selection.endId = typeof selectionEnd === 'number' ? indexToId(this.str, selectionEnd ?? 0) ?? null : null;
+    selection.startId = typeof selectionStart === 'number' ? str.findId((selectionStart ?? 0) - 1) ?? null : null;
+    selection.endId = typeof selectionEnd === 'number' ? str.findId((selectionEnd ?? 0) - 1) ?? null : null;
   }
 
   // ------------------------------------------------------ Model-to-Input sync
@@ -69,9 +69,9 @@ export class StrBinding {
   protected readonly onModelChange = () => {
     this.firstOnly(() => {
       this.syncFromModel();
-      const {input, selection} = this;
-      const start = selection.startId ? idToIndex(this.str, selection.startId) : null;
-      const end = selection.endId ? idToIndex(this.str, selection.endId) : null;
+      const {input, selection, str} = this;
+      const start = selection.startId ? str.findPos(selection.startId) + 1 : null;
+      const end = selection.endId ? str.findPos(selection.endId) + 1 : null;
       input.setSelectionRange(start, end, selection.dir ?? undefined);
       this.saveSelection();
     });
