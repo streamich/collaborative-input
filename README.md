@@ -29,4 +29,4 @@ unbind();
 
 ## Preview
 
-See [demo](https://github.com/streamich/collaborative-input).
+See [demo](https://streamich.github.io/collaborative-input).
