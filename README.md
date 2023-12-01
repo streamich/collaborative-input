@@ -18,7 +18,7 @@ Usage:
 ```ts
 import {StrBinding} from 'collaborative-input';
 
-const str = model.str(['path', 'to', 'string']);
+const str = model.api.str(['path', 'to', 'string']);
 const input = document.getElementById('input');
 const unbind = StrBinding.bind(str, input);
 
