@@ -6,7 +6,7 @@ export class Selection {
   /** Local selection end. */
   public end: number | null = null;
   /** Local selection direction. */
-  public dir: 'forward' | 'backward' | 'none' | null = null;
+  public dir: -1 | 0 | 1 = 0;
   /** Timestamp when selection last updated. */
   public ts: number = 0;
   /** Model tick. */
