@@ -6,7 +6,10 @@ export class InputEditor implements EditorFacade {
   public onchange?: (change: SimpleChange | void) => void;
   public onselection?: () => void;
 
-  constructor(protected readonly str: StrApi, protected readonly input: HTMLInputElement | HTMLTextAreaElement) {
+  constructor(
+    protected readonly str: StrApi,
+    protected readonly input: HTMLInputElement | HTMLTextAreaElement,
+  ) {
     input.addEventListener('input', this.onInput as any);
     document.addEventListener('selectionchange', this.onSelectionChange);
   }
