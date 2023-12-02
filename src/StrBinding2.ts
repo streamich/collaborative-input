@@ -1,7 +1,7 @@
 import {invokeFirstOnly} from './util';
 import {Selection} from './Selection';
 import {applyChange} from './util';
-import {SimpleChange} from './types';
+import type {EditorFacade, SimpleChange} from './types';
 import type {StrApi} from 'json-joy/es2020/json-crdt';
 const diff = require('fast-diff');
 
@@ -12,19 +12,8 @@ const enum DIFF_CHANGE_TYPE {
 }
 
 export class StrBinding {
-  public static bind = (
-    str: StrApi,
-    editor: EditorFacade,
-    polling?: boolean,
-  ): (() => void) => {
-    const binding = new StrBinding(str, editor);
-    binding.syncFromModel();
-    binding.bind(polling);
-    return binding.unbind;
-  };
-
   protected readonly selection = new Selection();
-  protected readonly firstOnly = invokeFirstOnly();
+  protected readonly race = invokeFirstOnly();
 
   constructor(
     protected readonly str: StrApi,
@@ -55,8 +44,8 @@ export class StrBinding {
     selection.endId = typeof selectionEnd === 'number' ? str.findId((selectionEnd ?? 0) - 1) ?? null : null;
   }
 
-  // ------------------------------------------------------ Model-to-Input sync
-  // We can always sync the model to the input. However, it is done only in
+  // ----------------------------------------------------- Model-to-Editor sync
+  // We can always sync the model to the editor. However, it is done only in
   // two cases: (1) on initial binding, and (2) when the model receives remote
   // changes. The latter is done by listening to the changes event on the str
   // instance.
@@ -66,7 +55,7 @@ export class StrBinding {
   }
 
   protected readonly onModelChange = () => {
-    this.firstOnly(() => {
+    this.race(() => {
       this.syncFromModel();
       const {editor, selection, str} = this;
       const start = selection.startId ? str.findPos(selection.startId) + 1 : -1;
@@ -76,19 +65,19 @@ export class StrBinding {
     });
   };
 
-  // ------------------------------------------------------ Input-to-Model sync
-  // The main synchronization is from the input to the model. This is done by
-  // listening to the input event, most of the time, using the
-  // `changeFromEvent()`. However, some changes might be too complex, in which
-  // case the implementation bails out of granular input synchronization and
-  // instead synchronizes the whole input value with the model. The whole state
-  // synchronization is done by `syncFromInput()`, which uses the char-by-char
-  // diffing algorithm to compute the changes.
+  // ----------------------------------------------------- Editor-to-Model sync
+  // The main synchronization is from the editor to the model. This is done by
+  // listening to the change events of the editor. However, some changes might
+  // be too complex, in which case the implementation bails out of granular
+  // input synchronization and instead synchronizes the whole editor value
+  // with the model. The whole state synchronization is done
+  // by `syncFromInput()`, which uses the char-by-char diffing algorithm to
+  // compute the changes.
 
-  public syncFromInput() {
-    const {str, input} = this;
+  public syncFromEditor() {
+    const {str, editor} = this;
     const view = str.view();
-    const value = input.value;
+    const value = editor.get();
     if (value === view) return;
     // console.log('FULL_SYNC');
     const selection = this.selection;
@@ -117,93 +106,22 @@ export class StrBinding {
     }
   }
 
-  protected changeFromEvent(event: InputEvent): SimpleChange | undefined {
-    // console.log(event);
-    const {input} = this;
-    const {data, inputType, isComposing} = event;
-    if (isComposing) return;
-    switch (inputType) {
-      case 'deleteContentBackward': {
-        const {selection} = this;
-        const {start, end} = selection;
-        if (typeof start !== 'number' || typeof end !== 'number') return;
-        if (start === end) return [start - 1, 1, ''];
-        return [start, end - start, ''];
-      }
-      case 'deleteContentForward': {
-        const {selection} = this;
-        const {start, end} = selection;
-        if (typeof start !== 'number' || typeof end !== 'number') return;
-        if (start === end) return [start, 1, ''];
-        return [start, end - start, ''];
-      }
-      case 'deleteByCut': {
-        const {start, end} = this.selection;
-        if (typeof start !== 'number' || typeof end !== 'number') return;
-        if (start === end) return;
-        const min = Math.min(start, end);
-        const max = Math.max(start, end);
-        const str = this.str;
-        const view = str.view();
-        const input = this.input;
-        const value = input.value;
-        if (view.length - value.length !== max - min) return;
-        return [min, max - min, ''];
-      }
-      case 'insertFromPaste': {
-        const {start, end} = this.selection;
-        if (typeof start !== 'number' || typeof end !== 'number') return;
-        const min = Math.min(start, end);
-        const max = Math.max(start, end);
-        const str = this.str;
-        const view = str.view();
-        const input = this.input;
-        const value = input.value;
-        const newMax = Math.max(input.selectionStart ?? 0, input.selectionEnd ?? 0);
-        if (newMax <= min) return;
-        const remove = max - min;
-        const insert = value.slice(min, newMax);
-        if (value.length !== view.length - remove + insert.length) return;
-        return [min, remove, insert];
-      }
-      case 'insertText': {
-        if (!data || data.length !== 1) return;
-        const {selectionStart, selectionEnd} = input;
-        if (selectionStart === null || selectionEnd === null) return;
-        if (selectionStart !== selectionEnd) return;
-        if (selectionStart <= 0) return;
-        const selection = this.selection;
-        if (selectionStart - data.length !== selection.start) return;
-        if (typeof selection.end !== 'number' || typeof selection.end !== 'number') return;
-        const remove = selection.end - selection.start;
-        return [selection.start, remove, data];
-      }
-    }
-    return;
-  }
-
-  private readonly onInput = (event: Event) => {
-    this.firstOnly(() => {
-      const input = this.input;
-      const change = this.changeFromEvent(event as InputEvent);
+  private readonly onchange = (change: SimpleChange | null) => {
+    this.race(() => {
       if (change) {
         const view = this.str.view();
-        const value = input.value;
         const expected = applyChange(view, change);
-        if (expected === value) {
+        const editor = this.editor;
+        if (expected.length === editor.getLength() && expected === editor.get()) {
           const str = this.str;
           const [position, remove, insert] = change;
           if (remove) str.del(position, remove);
           if (insert) str.ins(position, insert);
         }
       }
-      this.syncFromInput();
+      this.syncFromEditor();
       this.saveSelection();
     });
-  };
-
-  private readonly onSelectionChange = () => {
-    this.saveSelection();
   };
 
   // ------------------------------------------------------------------ Polling
@@ -218,11 +136,11 @@ export class StrBinding {
 
   private readonly pollChanges = () => {
     this.pollingRef = setTimeout(() => {
-      this.firstOnly(() => {
+      this.race(() => {
         try {
           const view = this.str.view();
           const value = this.editor.get();
-          if (view !== value) this.syncFromInput();
+          if (view !== value) this.syncFromEditor();
         } catch {}
         if (this.pollingRef) this.pollChanges();
       });
@@ -236,23 +154,19 @@ export class StrBinding {
 
   // ------------------------------------------------------------------ Binding
 
-  private unsubModel: (() => void) | null = null;
-  private unsubEditor: (() => void) | null = null;
+  private _s: (() => void) | null = null;
 
   public readonly bind = (polling?: boolean) => {
-    // const input = this.input;
-    // input.addEventListener('input', this.onInput);
-    this.unsubEdtor
-    document.addEventListener('selectionchange', this.onSelectionChange);
+    const editor = this.editor;
+    editor.onchange = this.onchange;
+    editor.onselection = () => this.saveSelection();
     if (polling) this.pollChanges();
-    this.unsubModel = this.str.api.onChange.listen(this.onModelChange);
+    this._s = this.str.api.onChange.listen(this.onModelChange);
   };
 
   public readonly unbind = () => {
-    const input = this.input;
-    input.removeEventListener('input', this.onInput);
-    document.removeEventListener('selectionchange', this.onSelectionChange);
     this.stopPolling();
-    if (this.unsubModel) this.unsubModel();
+    if (this._s) this._s();
+    this.editor.dispose();
   };
 }

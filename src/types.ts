@@ -1,3 +1,10 @@
+import type {Selection} from "./Selection";
+
+/**
+ * Represents a single change in the editor. It is a 3-tuple of `[position,
+ * remove, insert]`, where `position` is the position of the change, `remove`
+ * is the number of characters removed, and `insert` is the string inserted.
+ */
 export type SimpleChange = [position: number, remove: number, insert: string];
 
 /**
@@ -15,6 +22,8 @@ export type EditorSelection = [start: number, end: number, direction: -1 | 0 | 1
  * or an input element, or a code editor, such as CodeMirror or Monaco.
  */
 export interface EditorFacade {
+  // ----------------------------------------------------------------- Contents
+
   /**
    * Emits a change event when the text changes. The event is emitted with
    * a `SimpleChange` tuple, which is a tuple of `[position, remove, insert]`,
@@ -26,11 +35,6 @@ export interface EditorFacade {
    * most basic implementation, one can always emit `null` on every change.
    */
   onchange?: (change: SimpleChange | null) => void;
-
-  /**
-   * Called when the selection changes.
-   */
-  onselection?: (selection: EditorSelection | null) => void;
 
   /**
    * Returns the text content of the editor.
@@ -45,20 +49,38 @@ export interface EditorFacade {
   getLength(): number;
 
   /**
-   * Returns the current selection.
-   */
-  getSelection(): EditorSelection | null;
-
-  /**
    * Overwrites the editor content with the given text.
    * @param text Raw text to set.
    */
   set(text: string): void;
 
+
+  // ---------------------------------------------------------------- Selection
+
+  /**
+   * Called when the selection changes.
+   */
+  onselection?: () => void;
+
+  /**
+   * Returns the current selection.
+   */
+  getSelection(): EditorSelection | null;
+
   /**
    * Sets the editor selection.
    */
   setSelection(start: number, end: number, direction: -1 | 0 | 1): void;
+
+  /**
+   * This property does not have to be set, it is set by the binding once it is
+   * created. It store the last know selection, which can be used to generate
+   * `SimpleChange` events.
+   */
+  selection?: Selection;
+
+
+  // ---------------------------------------------------------------- Lifecycle
 
   /**
    * Binding calls this method when it is no longer needed. This method should
