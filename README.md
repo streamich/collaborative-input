@@ -16,11 +16,11 @@ npm install json-joy collaborative-input
 Usage:
 
 ```ts
-import {StrBinding} from 'collaborative-input';
+import {bind} from 'collaborative-input';
 
 const str = model.api.str(['path', 'to', 'string']);
 const input = document.getElementById('input');
-const unbind = StrBinding.bind(str, input);
+const unbind = bind(str, input);
 
 // When done, unbind the binding.
 unbind();
