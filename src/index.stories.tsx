@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Model} from 'json-joy/es2020/json-crdt';
-import {StrBinding} from './StrBinding';
+import {bind} from '.';
 import type {Meta, StoryObj} from '@storybook/react';
 
 const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
@@ -14,7 +14,7 @@ const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
   React.useEffect(() => {
     if (!inputRef.current) return;
     const input = inputRef.current;
-    const unbind = StrBinding.bind(model.api.str(['text']), input, true);
+    const unbind = bind(model.api.str(['text']), input, true);
     return () => {
       unbind();
     };
