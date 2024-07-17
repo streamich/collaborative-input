@@ -1,9 +1,9 @@
 import type {SimpleChange, EditorFacade, Selection} from 'collaborative-editor';
-import type {StrApi} from 'json-joy/es2020/json-crdt';
+import type {StrApi} from 'json-joy/lib/json-crdt';
 
 export class InputEditor implements EditorFacade {
   public selection!: Selection;
-  public onchange?: (change: SimpleChange | void) => void;
+  public onchange?: (change: SimpleChange[] | void, verify?: boolean) => void;
   public onselection?: () => void;
 
   constructor(
@@ -45,21 +45,29 @@ export class InputEditor implements EditorFacade {
   }
 
   protected createChange(event: InputEvent): SimpleChange | undefined {
-    // console.log(event);
-    const {input} = this;
-    const {data, inputType, isComposing} = event;
-    if (isComposing) return;
-    switch (inputType) {
+    if (event.isComposing) return;
+    switch (event.inputType) {
+      case 'insertText': {
+        const data = event.data;
+        if (!data || data.length !== 1) return;
+        const {selectionStart, selectionEnd} = this.input;
+        if (selectionStart === null || selectionEnd === null) return;
+        if (selectionStart !== selectionEnd) return;
+        if (selectionStart <= 0) return;
+        const selection = this.selection;
+        if (selectionStart - data.length !== selection.start) return;
+        if (typeof selection.end !== 'number' || typeof selection.end !== 'number') return;
+        const remove = selection.end - selection.start;
+        return [selection.start, remove, data];
+      }
       case 'deleteContentBackward': {
-        const {selection} = this;
-        const {start, end} = selection;
+        const {start, end} = this.selection;
         if (typeof start !== 'number' || typeof end !== 'number') return;
         if (start === end) return [start - 1, 1, ''];
         return [start, end - start, ''];
       }
       case 'deleteContentForward': {
-        const {selection} = this;
-        const {start, end} = selection;
+        const {start, end} = this.selection;
         if (typeof start !== 'number' || typeof end !== 'number') return;
         if (start === end) return [start, 1, ''];
         return [start, end - start, ''];
@@ -93,25 +101,13 @@ export class InputEditor implements EditorFacade {
         if (value.length !== view.length - remove + insert.length) return;
         return [min, remove, insert];
       }
-      case 'insertText': {
-        if (!data || data.length !== 1) return;
-        const {selectionStart, selectionEnd} = input;
-        if (selectionStart === null || selectionEnd === null) return;
-        if (selectionStart !== selectionEnd) return;
-        if (selectionStart <= 0) return;
-        const selection = this.selection;
-        if (selectionStart - data.length !== selection.start) return;
-        if (typeof selection.end !== 'number' || typeof selection.end !== 'number') return;
-        const remove = selection.end - selection.start;
-        return [selection.start, remove, data];
-      }
     }
     return;
   }
 
   private readonly onInput = (event: Event) => {
     const change = this.createChange(event as InputEvent);
-    this.onchange!(change);
+    this.onchange!(change ? [change] : void 0);
   };
 
   private readonly onSelectionChange = () => {
