@@ -1,9 +1,9 @@
 import type {SimpleChange, EditorFacade, Selection} from 'collaborative-editor';
-import type {StrApi} from 'json-joy/es2020/json-crdt';
+import type {StrApi} from 'json-joy/lib/json-crdt';
 
 export class InputEditor implements EditorFacade {
   public selection!: Selection;
-  public onchange?: (change: SimpleChange | void) => void;
+  public onchange?: (change: SimpleChange[] | void, verify?: boolean) => void;
   public onselection?: () => void;
 
   constructor(
@@ -44,42 +44,56 @@ export class InputEditor implements EditorFacade {
     input.selectionDirection = direction === -1 ? 'backward' : direction === 1 ? 'forward' : 'none';
   }
 
-  protected createChange(event: InputEvent): SimpleChange | undefined {
-    // console.log(event);
-    const {input} = this;
-    const {data, inputType, isComposing} = event;
-    if (isComposing) return;
-    switch (inputType) {
+  protected emitChange(event: InputEvent): void {
+    if (event.isComposing) return;
+    switch (event.inputType) {
+      case 'insertText': {
+        const data = event.data;
+        if (!data || data.length !== 1) break;
+        const {selectionStart, selectionEnd} = this.input;
+        if (selectionStart === null || selectionEnd === null) break;
+        if (selectionStart !== selectionEnd) break;
+        if (selectionStart <= 0) break;
+        const selection = this.selection;
+        if (selectionStart - data.length !== selection.start) break;
+        if (typeof selection.end !== 'number' || typeof selection.end !== 'number') break;
+        const remove = selection.end - selection.start;
+        const change: SimpleChange = [selection.start, remove, data];
+        this.onchange!([change]);
+        return;
+      }
       case 'deleteContentBackward': {
-        const {selection} = this;
-        const {start, end} = selection;
-        if (typeof start !== 'number' || typeof end !== 'number') return;
-        if (start === end) return [start - 1, 1, ''];
-        return [start, end - start, ''];
+        const {start, end} = this.selection;
+        if (typeof start !== 'number' || typeof end !== 'number') break;
+        const change: SimpleChange = start === end ? [start - 1, 1, ''] : [start, end - start, ''];
+        this.onchange!([change]);
+        return;
       }
       case 'deleteContentForward': {
-        const {selection} = this;
-        const {start, end} = selection;
-        if (typeof start !== 'number' || typeof end !== 'number') return;
-        if (start === end) return [start, 1, ''];
-        return [start, end - start, ''];
+        const {start, end} = this.selection;
+        if (typeof start !== 'number' || typeof end !== 'number') break;
+        const change: SimpleChange = start === end ? [start, 1, ''] : [start, end - start, ''];
+        this.onchange!([change]);
+        return;
       }
       case 'deleteByCut': {
         const {start, end} = this.selection;
-        if (typeof start !== 'number' || typeof end !== 'number') return;
-        if (start === end) return;
+        if (typeof start !== 'number' || typeof end !== 'number') break;
+        if (start === end) break;
         const min = Math.min(start, end);
         const max = Math.max(start, end);
         const str = this.str;
         const view = str.view();
         const input = this.input;
         const value = input.value;
-        if (view.length - value.length !== max - min) return;
-        return [min, max - min, ''];
+        if (view.length - value.length !== max - min) break;
+        const change: SimpleChange = [min, max - min, ''];
+        this.onchange!([change]);
+        return;
       }
       case 'insertFromPaste': {
         const {start, end} = this.selection;
-        if (typeof start !== 'number' || typeof end !== 'number') return;
+        if (typeof start !== 'number' || typeof end !== 'number') break;
         const min = Math.min(start, end);
         const max = Math.max(start, end);
         const str = this.str;
@@ -87,31 +101,20 @@ export class InputEditor implements EditorFacade {
         const input = this.input;
         const value = input.value;
         const newMax = Math.max(input.selectionStart ?? 0, input.selectionEnd ?? 0);
-        if (newMax <= min) return;
+        if (newMax <= min) break;
         const remove = max - min;
         const insert = value.slice(min, newMax);
         if (value.length !== view.length - remove + insert.length) return;
-        return [min, remove, insert];
-      }
-      case 'insertText': {
-        if (!data || data.length !== 1) return;
-        const {selectionStart, selectionEnd} = input;
-        if (selectionStart === null || selectionEnd === null) return;
-        if (selectionStart !== selectionEnd) return;
-        if (selectionStart <= 0) return;
-        const selection = this.selection;
-        if (selectionStart - data.length !== selection.start) return;
-        if (typeof selection.end !== 'number' || typeof selection.end !== 'number') return;
-        const remove = selection.end - selection.start;
-        return [selection.start, remove, data];
+        const change: SimpleChange = [min, remove, insert];
+        this.onchange!([change]);
+        return;
       }
     }
-    return;
+    this.onchange!();
   }
 
   private readonly onInput = (event: Event) => {
-    const change = this.createChange(event as InputEvent);
-    this.onchange!(change);
+    this.emitChange(event as InputEvent);
   };
 
   private readonly onSelectionChange = () => {
