@@ -26,6 +26,33 @@ export class InputEditor implements EditorFacade {
     this.input.value = text;
   }
 
+  public ins(position: number, text: string): void {
+    const selection = this.getSelection();
+    const value = this.get();
+    const next = value.slice(0, position) + text + value.slice(position);
+    this.set(next);
+    if (selection) {
+      let [start, end] = selection;
+      const length = text.length;
+      if (start >= position) start += length;
+      if (end >= position) end += length;
+      this.setSelection(start, end, selection[2]);
+    }
+  }
+
+  public del(position: number, length: number): void {
+    const selection = this.getSelection();
+    const value = this.get();
+    const next = value.slice(0, position) + value.slice(position + length);
+    this.set(next);
+    if (selection) {
+      let [start, end] = selection;
+      if (start >= position) start = Math.max(position, start - length);
+      if (end >= position) end = Math.max(position, end - length);
+      this.setSelection(start, end, selection[2]);
+    }
+  }
+
   public getSelection(): [number, number, -1 | 0 | 1] | null {
     const input = this.input;
     const {selectionStart, selectionEnd, selectionDirection} = input;
