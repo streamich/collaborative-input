@@ -61,6 +61,42 @@ const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
           onClick={() => {
             setTimeout(() => {
               const str = model.api.str(['text']);
+              str.ins(Math.min(3, str.length()), 'abc');
+            }, 2000);
+          }}
+        >
+          Insert "abc" into model at pos 3 after 2s
+        </button>
+      </div>
+      <div>
+        <button
+          onClick={() => {
+            setTimeout(() => {
+              const str = model.api.str(['text']);
+              str.del(3, Math.min(5, str.length() - 3));
+            }, 2000);
+          }}
+        >
+          Delete 5 chars from model at pos 3 after 2s
+        </button>
+      </div>
+      <div>
+        <button
+          onClick={() => {
+            setTimeout(() => {
+              const str = model.api.str(['text']);
+              str.del(1, 1);
+            }, 2000);
+          }}
+        >
+          Delete second character after 2s
+        </button>
+      </div>
+      <div>
+        <button
+          onClick={() => {
+            setTimeout(() => {
+              const str = model.api.str(['text']);
               str.ins(0, '1. ');
             }, 2000);
           }}
