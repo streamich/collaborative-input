@@ -35,7 +35,7 @@ export class InputEditor implements EditorFacade {
       let [start, end] = selection;
       const length = text.length;
       if (start >= position) start += length;
-      if (end >= position) end += length;
+      if (end > position) end += length;
       this.setSelection(start, end, selection[2]);
     }
   }

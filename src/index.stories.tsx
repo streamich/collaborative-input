@@ -85,6 +85,18 @@ const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
           onClick={() => {
             setTimeout(() => {
               const str = model.api.str(['text']);
+              str.del(1, 1);
+            }, 2000);
+          }}
+        >
+          Delete second character after 2s
+        </button>
+      </div>
+      <div>
+        <button
+          onClick={() => {
+            setTimeout(() => {
+              const str = model.api.str(['text']);
               str.ins(0, '1. ');
             }, 2000);
           }}
