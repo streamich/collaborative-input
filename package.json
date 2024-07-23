@@ -46,7 +46,6 @@
     "collaborative-editor": "^2.4.0"
   },
   "peerDependencies": {
-    "json-joy": "*",
     "tslib": "2"
   },
   "devDependencies": {

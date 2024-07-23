@@ -1,5 +1,5 @@
 import type {SimpleChange, EditorFacade, Selection} from 'collaborative-editor';
-import type {StrApi} from 'json-joy/lib/json-crdt';
+import type {CollaborativeStr} from 'collaborative-editor';
 
 export class InputEditor implements EditorFacade {
   public selection!: Selection;
@@ -7,7 +7,7 @@ export class InputEditor implements EditorFacade {
   public onselection?: () => void;
 
   constructor(
-    protected readonly str: StrApi,
+    protected readonly str: CollaborativeStr,
     protected readonly input: HTMLInputElement | HTMLTextAreaElement,
   ) {
     input.addEventListener('input', this.onInput as any);
