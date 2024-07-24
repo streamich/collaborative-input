@@ -14,7 +14,7 @@ const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
   React.useEffect(() => {
     if (!inputRef.current) return;
     const input = inputRef.current;
-    const unbind = bind(model.api.str(['text']), input, true);
+    const unbind = bind(() => model.api.str(['text']), input, true);
     return () => {
       unbind();
     };
