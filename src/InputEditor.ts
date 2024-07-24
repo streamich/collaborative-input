@@ -7,7 +7,7 @@ export class InputEditor implements EditorFacade {
   public onselection?: () => void;
 
   constructor(
-    protected readonly str: CollaborativeStr,
+    protected readonly str: () => CollaborativeStr,
     protected readonly input: HTMLInputElement | HTMLTextAreaElement,
   ) {
     input.addEventListener('input', this.onInput as any);
@@ -109,8 +109,7 @@ export class InputEditor implements EditorFacade {
         if (start === end) break;
         const min = Math.min(start, end);
         const max = Math.max(start, end);
-        const str = this.str;
-        const view = str.view();
+        const view = this.str().view();
         const input = this.input;
         const value = input.value;
         if (view.length - value.length !== max - min) break;
@@ -123,8 +122,7 @@ export class InputEditor implements EditorFacade {
         if (typeof start !== 'number' || typeof end !== 'number') break;
         const min = Math.min(start, end);
         const max = Math.max(start, end);
-        const str = this.str;
-        const view = str.view();
+        const view = this.str().view();
         const input = this.input;
         const value = input.value;
         const newMax = Math.max(input.selectionStart ?? 0, input.selectionEnd ?? 0);
