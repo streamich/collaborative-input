@@ -3041,9 +3041,9 @@ __metadata:
   linkType: hard
 
 "@types/lodash@npm:^4.14.167":
-  version: 4.17.7
-  resolution: "@types/lodash@npm:4.17.7"
-  checksum: 10c0/40c965b5ffdcf7ff5c9105307ee08b782da228c01b5c0529122c554c64f6b7168fc8f11dc79aa7bae4e67e17efafaba685dc3a47e294dbf52a65ed2b67100561
+  version: 4.17.8
+  resolution: "@types/lodash@npm:4.17.8"
+  checksum: 10c0/e29d5fc3e4887ffe0e8365170ccc406a54f34692c3922b3ddaf6b1e208bf099fe512f53a512bf101200e3f4f50d13de8e99219c4859c2711b91c9e15d8c61ef4
   languageName: node
   linkType: hard
 
@@ -3062,11 +3062,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:*, @types/node@npm:^22.0.0":
-  version: 22.5.5
-  resolution: "@types/node@npm:22.5.5"
+  version: 22.6.0
+  resolution: "@types/node@npm:22.6.0"
   dependencies:
     undici-types: "npm:~6.19.2"
-  checksum: 10c0/ead9495cfc6b1da5e7025856dcce2591e9bae635357410c0d2dd619fce797d2a1d402887580ca4b336cb78168b195224869967de370a23f61663cf1e4836121c
+  checksum: 10c0/165fa685fbe51baf47948273487d1cf733a8802f0ddf3f07f357aec6d73012ff79be1982ba40ae6d30ac21ad0bebdbe373cf1cf8a307991130bc361a92d0c30b
   languageName: node
   linkType: hard
 
@@ -4409,8 +4409,8 @@ __metadata:
   linkType: hard
 
 "chromatic@npm:^11.4.0":
-  version: 11.10.2
-  resolution: "chromatic@npm:11.10.2"
+  version: 11.10.3
+  resolution: "chromatic@npm:11.10.3"
   peerDependencies:
     "@chromatic-com/cypress": ^0.*.* || ^1.0.0
     "@chromatic-com/playwright": ^0.*.* || ^1.0.0
@@ -4423,7 +4423,7 @@ __metadata:
     chroma: dist/bin.js
     chromatic: dist/bin.js
     chromatic-cli: dist/bin.js
-  checksum: 10c0/167633dc1d3d0309af4524e7603a887d3481bc6005a2c0cb955d9ca0e17223bd0335a01844835fe34f1823df308032d6b238bced644a755a3f7c265728ac5e41
+  checksum: 10c0/941e2c0743a4e199f07219dac6561e98936be350de8d1487c6488340e1567a6cc29e4caf22f641b638e48096f552902bf98668082b6d86a4884902a93dda73ed
   languageName: node
   linkType: hard
 
