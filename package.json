@@ -43,7 +43,7 @@
     "crdt"
   ],
   "dependencies": {
-    "collaborative-editor": "^2.7.0"
+    "collaborative-editor": "^2.8.0"
   },
   "peerDependencies": {
     "tslib": "2"
