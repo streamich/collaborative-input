@@ -6,7 +6,7 @@ import type {Meta, StoryObj} from '@storybook/react';
 const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
   const inputRef = React.useRef<HTMLInputElement | HTMLTextAreaElement>(null);
   const [model, clone] = React.useMemo(() => {
-    const model = Model.withLogicalClock();
+    const model = Model.create();
     model.api.root({text: 'Hell'});
     return [model, model.clone()];
   }, [1]);
