@@ -9,7 +9,7 @@ const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
     const model = Model.create();
     model.api.root({text: 'Hell'});
     return [model, model.clone()];
-  }, [1]);
+  }, []);
   React.useSyncExternalStore(model.api.subscribe, () => model.tick);
   React.useEffect(() => {
     if (!inputRef.current) return;
@@ -25,6 +25,7 @@ const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
       {textarea ? <textarea ref={inputRef as any} /> : <input ref={inputRef as any} type="text" />}
       <div>
         <button
+          type={'button'}
           onClick={() => {
             const input = inputRef.current;
             if (!input) return;
@@ -36,6 +37,7 @@ const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
       </div>
       <div>
         <button
+          type={'button'}
           onClick={() => {
             const str = model.api.str(['text']);
             str.ins(str.view().length, '?');
@@ -46,6 +48,7 @@ const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
       </div>
       <div>
         <button
+          type={'button'}
           onClick={() => {
             setTimeout(() => {
               const str = model.api.str(['text']);
@@ -58,6 +61,7 @@ const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
       </div>
       <div>
         <button
+          type={'button'}
           onClick={() => {
             setTimeout(() => {
               const str = model.api.str(['text']);
@@ -70,6 +74,7 @@ const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
       </div>
       <div>
         <button
+          type={'button'}
           onClick={() => {
             setTimeout(() => {
               const str = model.api.str(['text']);
@@ -82,6 +87,7 @@ const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
       </div>
       <div>
         <button
+          type={'button'}
           onClick={() => {
             setTimeout(() => {
               const str = model.api.str(['text']);
@@ -94,6 +100,7 @@ const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
       </div>
       <div>
         <button
+          type={'button'}
           onClick={() => {
             setTimeout(() => {
               const str = model.api.str(['text']);
@@ -106,6 +113,7 @@ const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
       </div>
       <div>
         <button
+          type={'button'}
           onClick={() => {
             setTimeout(() => {
               model.reset(clone);

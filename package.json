@@ -16,11 +16,10 @@
     "lib/"
   ],
   "scripts": {
-    "prettier": "prettier --ignore-path .gitignore --write 'src/**/*.{ts,tsx,js,jsx}'",
-    "prettier:check": "prettier --ignore-path .gitignore --list-different 'src/**/*.{ts,tsx,js,jsx}'",
-    "lint": "yarn eslint",
-    "lint:fix": "yarn eslint --fix",
-    "eslint": "eslint src",
+    "format": "biome format ./src",
+    "format:fix": "biome format --write ./src",
+    "lint": "biome lint ./src",
+    "lint:fix": "biome lint --write ./src",
     "clean": "rimraf dist lib es6 es2019 es2020 esm typedocs storybook-static",
     "build": "tsc --project tsconfig.build.json",
     "jest": "jest",
@@ -52,6 +51,7 @@
     "@babel/preset-env": "^7.25.4",
     "@babel/preset-react": "^7.24.7",
     "@babel/preset-typescript": "^7.24.7",
+    "@biomejs/biome": "^1.9.4",
     "@chromatic-com/storybook": "^2.0.2",
     "@jsonjoy.com/base64": "^1.1.2",
     "@jsonjoy.com/json-pack": "^1.2.0",
@@ -107,22 +107,6 @@
     "moduleNameMapper": {
       "^(\\.{1,2}/.*)\\.js$": "$1"
     }
-  },
-  "prettier": {
-    "arrowParens": "always",
-    "printWidth": 120,
-    "tabWidth": 2,
-    "useTabs": false,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "all",
-    "bracketSpacing": false
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "config": {
     "config": {
