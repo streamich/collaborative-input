@@ -23,13 +23,27 @@ const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
 
   return (
     <div>
-      <CollaborativeInput str={() => model.api.str(['text'])} input={(connect) => (
-        textarea ? (
-          <textarea ref={(el) => {connect(el); (inputRef as any).current = el; }} />
-        ) : (
-          <input ref={(el) => {connect(el); (inputRef as any).current = el; }} type="text" />
-        )
-      )} />
+      <CollaborativeInput
+        str={() => model.api.str(['text'])}
+        input={(connect) =>
+          textarea ? (
+            <textarea
+              ref={(el) => {
+                connect(el);
+                (inputRef as any).current = el;
+              }}
+            />
+          ) : (
+            <input
+              ref={(el) => {
+                connect(el);
+                (inputRef as any).current = el;
+              }}
+              type="text"
+            />
+          )
+        }
+      />
       <div>
         <button
           type={'button'}
