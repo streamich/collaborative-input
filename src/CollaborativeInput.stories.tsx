@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {Model} from 'json-joy/lib/json-crdt';
 import {bind} from '.';
+import {CollaborativeInput} from './CollaborativeInput';
 import type {Meta, StoryObj} from '@storybook/react';
 
 const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
@@ -22,7 +23,13 @@ const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
 
   return (
     <div>
-      {textarea ? <textarea ref={inputRef as any} /> : <input ref={inputRef as any} type="text" />}
+      <CollaborativeInput str={() => model.api.str(['text'])} input={(connect) => (
+        textarea ? (
+          <textarea ref={(el) => {connect(el); (inputRef as any).current = el; }} />
+        ) : (
+          <input ref={(el) => {connect(el); (inputRef as any).current = el; }} type="text" />
+        )
+      )} />
       <div>
         <button
           type={'button'}
@@ -131,7 +138,7 @@ const Demo: React.FC<{textarea: boolean}> = ({textarea}) => {
 };
 
 const meta: Meta<typeof Text> = {
-  title: 'InputEditor',
+  title: '<CollaborativeInput>',
   component: Demo as any,
   argTypes: {},
 };

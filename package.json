@@ -42,7 +42,8 @@
     "crdt"
   ],
   "dependencies": {
-    "collaborative-editor": "^2.9.0"
+    "collaborative-editor": "^2.9.0",
+    "json-joy": "^17.42.0"
   },
   "peerDependencies": {
     "tslib": "2"
