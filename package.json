@@ -52,7 +52,7 @@
     "@babel/preset-env": "^7.25.4",
     "@babel/preset-react": "^7.24.7",
     "@babel/preset-typescript": "^7.24.7",
-    "@biomejs/biome": "^1.9.4",
+    "@biomejs/biome": "^2.0.0",
     "@chromatic-com/storybook": "^2.0.2",
     "@jsonjoy.com/base64": "^1.1.2",
     "@jsonjoy.com/json-pack": "^1.2.0",
